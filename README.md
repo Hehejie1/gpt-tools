@@ -1,4 +1,4 @@
-# README
+README
 
 ## About
 
@@ -17,3 +17,14 @@ to this in your browser, and you can call your Go code from devtools.
 ## Building
 
 To build a redistributable, production mode package, use `wails build`.
+==========================================================
+
+# gpt-tools
+
+>>>>>>> 033b63d2518aa52a5ee2017440654f76ed7731fa
+>>>>>>>
+>>>>>>
+>>>>>
+>>>>
+>>>
+>>
