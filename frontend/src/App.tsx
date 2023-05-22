@@ -1,28 +1,36 @@
-import {useState} from 'react';
-import logo from './assets/images/logo-universal.png';
-import './App.css';
-import {Greet} from "../wailsjs/go/main/App";
+import * as React from "react";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
 
-function App() {
-    const [resultText, setResultText] = useState("Please enter your name below 👇");
-    const [name, setName] = useState('');
-    const updateName = (e: any) => setName(e.target.value);
-    const updateResultText = (result: string) => setResultText(result);
+import { PageLayout } from "./layout";
+import { PAGE_PATH } from "./layout/routes";
+import { useMessageStore } from "./store/useMessage";
+import { useConfigStore } from "./store/useConfig";
 
-    function greet() {
-        Greet(name).then(updateResultText);
-    }
+// const defaultRoute = '/home'
+const defaultRoute = PAGE_PATH.home;
 
-    return (
-        <div id="App">
-            <img src={logo} id="logo" alt="logo"/>
-            <div id="result" className="result">{resultText}</div>
-            <div id="input" className="input-box">
-                <input id="name" className="input" onChange={updateName} autoComplete="off" name="input" type="text"/>
-                <button className="btn" onClick={greet}>Greet</button>
-            </div>
-        </div>
-    )
-}
+const App: React.FC = () => {
+  const { init: initMessage } = useMessageStore((state) => state);
+  const { init: initConfig } = useConfigStore((state) => state);
 
-export default App
+  React.useEffect(() => {
+    initMessage();
+    initConfig();
+  }, []);
+
+  return (
+    <Router>
+      <Routes>
+        <Route path="/" element={<Navigate to={defaultRoute} replace />} />
+        <Route path="/*" element={<PageLayout />} />
+      </Routes>
+    </Router>
+  );
+};
+
+export default App;

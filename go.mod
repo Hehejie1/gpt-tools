@@ -1,8 +1,11 @@
-module changeme
+module github.com/Hehejie1/gpt-tools
 
 go 1.18
 
-require github.com/wailsapp/wails/v2 v2.4.1
+require (
+	github.com/sashabaranov/go-openai v1.9.4
+	github.com/wailsapp/wails/v2 v2.5.1
+)
 
 require (
 	github.com/bep/debounce v1.2.1 // indirect
