@@ -14,8 +14,14 @@ export const SideMenu: React.FC<SideMenuProps> = () => {
     message: allMessage,
     getTitles,
     createMessage,
+    resetMessage,
+    updateId,
   } = useMessageStore((state) => state);
   const { config, updateConfig } = useConfigStore((state) => state);
+
+  const handleSelect = React.useCallback((item: any) => {
+    updateId(item.key);
+  }, []);
 
   const menuList = React.useMemo(() => {
     const list = getTitles() || [];
@@ -38,28 +44,48 @@ export const SideMenu: React.FC<SideMenuProps> = () => {
         theme={config?.theme}
         mode="inline"
         defaultSelectedKeys={["4"]}
+        onSelect={handleSelect}
         items={menuList}
       />
-      <Space direction="vertical" className="absolute bottom-12 left-0 p-4">
-        <Input
-          value={config?.sk}
-          onChange={(e) => {
-            message.success("设置成功");
-            updateConfig({ sk: e.target.value });
-          }}
-          placeholder="请输入key, sk-xxx"
-        />
-        <Select
-          value={config?.model}
-          className="w-full"
-          onChange={(model) => {
-            message.success("设置成功");
-            updateConfig({ model });
-          }}
-          options={models}
-        />
-        <Button className="w-full" type="dashed" onClick={createMessage}>
-          新建会话
+      <Space
+        split={
+          <div className="w-full border-t-2 border-dashed border-transparent border-t-white" />
+        }
+        direction="vertical"
+        className="absolute bottom-12 left-0 p-4"
+      >
+        <Space direction="vertical">
+          <Input
+            value={config?.sk}
+            onChange={(e) => {
+              message.success("设置成功");
+              updateConfig({ sk: e.target.value });
+            }}
+            placeholder="请输入key, sk-xxx"
+          />
+          <Input
+            value={config?.proxy}
+            onChange={(e) => {
+              message.success("设置成功");
+              updateConfig({ proxy: e.target.value });
+            }}
+            placeholder="请输入代理地址 https://xxx.com/v1"
+          />
+          <Select
+            value={config?.model}
+            className="w-full"
+            onChange={(model) => {
+              message.success("设置成功");
+              updateConfig({ model });
+            }}
+            options={models}
+          />
+          <Button className="w-full" type="dashed" onClick={createMessage}>
+            新建会话
+          </Button>
+        </Space>
+        <Button className="w-full" type="primary" danger onClick={resetMessage}>
+          清除会话
         </Button>
       </Space>
     </div>

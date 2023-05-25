@@ -17,4 +17,4 @@ export const models = [
   { label: "curie", value: "GPT3Curie" },
   { label: "ada", value: "GPT3Ada" },
   { label: "babbage", value: "GPT3Babbage" },
-];
+].map((item) => ({ label: item.value, value: item.label }));

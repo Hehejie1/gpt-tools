@@ -5,3 +5,4 @@ export * from "./crypto";
 export * from "./random";
 export * from "./dom";
 export * from "./use-local-sync";
+export * from "./time";

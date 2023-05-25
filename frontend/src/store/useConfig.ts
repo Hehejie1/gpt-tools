@@ -5,6 +5,8 @@ export type ConfigInfo = Partial<{
   sk: string;
   model: string;
   theme: "dark" | "light";
+  /** 代理地址 */
+  proxy: string;
 }>;
 
 export type UseConfigType = {
@@ -16,7 +18,7 @@ export type UseConfigType = {
 };
 
 const InitConfig: ConfigInfo = {
-  model: "GPT3Dot5Turbo",
+  model: "gpt-3.5-turbo",
   theme: "dark",
 };
 

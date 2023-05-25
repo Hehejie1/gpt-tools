@@ -3,6 +3,6 @@
 import {gpt} from '../models';
 import {context} from '../models';
 
-export function Send(arg1:string,arg2:gpt.SendOption):Promise<any>;
+export function Send(arg1:Array<gpt.ContentType>,arg2:gpt.SendOption):Promise<any>;
 
 export function Startup(arg1:context.Context):Promise<void>;

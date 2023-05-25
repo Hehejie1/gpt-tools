@@ -58,6 +58,8 @@ export type UseMessageType = {
   getMessage: (messageId?: MessageId) => undefined | MessageType;
   /** 删除绘画 */
   deleteMessage: (messageId?: MessageId) => Boolean;
+  /** 设置当前ID */
+  updateId: (id?: MessageId) => Boolean;
   /** 全部清空会话 */
   resetMessage: () => void;
 };
@@ -82,7 +84,7 @@ export const useMessageStore = create<UseMessageType>((set, get) => ({
     });
   },
   createMessage: () => {
-    const { message: prevMessage = {} } = get();
+    const { message: prevMessage = {} } = get() || {};
     const _id = uuidv4();
 
     const newMessage = {
@@ -179,6 +181,10 @@ export const useMessageStore = create<UseMessageType>((set, get) => ({
     delete prevMessage?.[messageId];
     saveMessage(prevMessage);
     set({ message: prevMessage });
+    return true;
+  },
+  updateId: (id?: MessageId) => {
+    set({ currentId: id });
     return true;
   },
   resetMessage: () => {

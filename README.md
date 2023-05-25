@@ -48,3 +48,5 @@ https://github.com/sashabaranov/go-openai
 [openAI中文文档](https://openai.xiniushu.com/)
 
 https://github.com/zhayujie/chatgpt-on-wechat/issues/321
+
+proxy代理： https://blog.csdn.net/taoshihan/article/details/129871020
