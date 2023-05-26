@@ -1,6 +1,8 @@
 build/bin
 node_modules
 frontend/dist
+frontend/package.json.md5
+frontend/wailsjs
 # If you prefer the allow list template instead of the deny list, see community template:
 # https://github.com/github/gitignore/blob/main/community/Golang/Go.AllowList.gitignore
 #
@@ -22,3 +24,13 @@ frontend/dist
 
 # Go workspace file
 go.work
+
+local
+remote
+account.surge
+*.proto
+db
+.DS_Store
+Output
+wailsjs
+.env
