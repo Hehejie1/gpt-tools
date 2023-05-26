@@ -3,10 +3,10 @@ name: Build Matrix
 on:
   pull_request:
     branches:
-    - master
+      - master
   # allows to run the workflow manually from the actions tab
   workflow_dispatch:
-      
+
 jobs:
   build:
     name: ${{ matrix.config.name }}
@@ -15,110 +15,88 @@ jobs:
       fail-fast: false
       matrix:
         config:
-        - {
-            name: "Windows", 
-            artifact: "Windows.tar.gz",
-            executable_name: "Restic-Browser.exe",
-            os: windows-2022,
-            build_tags: "production,desktop",
-            build_platform: "windows/amd64",
-          }
-        - {
-            name: "Ubuntu", 
-            artifact: "Linux.tar.gz",
-            executable_name: "restic-browser",
-            os: ubuntu-20.04,
-            build_tags: "production,desktop",
-            build_platform: "linux/amd64",
-          }
-        - {
-            name: "macOS", 
-            artifact: "macOS.tar.gz",
-            executable_name: "restic-browser.app",
-            os: macos-11,
-            build_tags: "production,desktop",
-            build_platform: "darwin/universal",
-          }
+          - {
+              name: "Windows",
+              artifact: "gpt-tools-window-amd64.tar.gz",
+              executable_name: "gpt-tools.exe",
+              os: windows-2022,
+              build_tags: "production,desktop",
+              build_platform: "windows/amd64",
+            }
+          - {
+              name: "Ubuntu",
+              artifact: "gpt-tools-linux-amd64.tar.gz",
+              executable_name: "gpt-tools",
+              os: ubuntu-20.04,
+              build_tags: "production,desktop",
+              build_platform: "linux/amd64",
+            }
+          - {
+              name: "macOS",
+              artifact: "gpt-tools-darwin-universal.tar.gz",
+              executable_name: "gpt-tools.app",
+              os: macos-11,
+              build_tags: "production,desktop",
+              build_platform: "darwin/universal",
+            }
+          - {
+              name: "macOS",
+              artifact: "gpt-tools-darwin-amd64.tar.gz",
+              executable_name: "gpt-tools.app",
+              os: macos-10,
+              build_tags: "production,desktop",
+              build_platform: "darwin/amd64",
+            }
+          - {
+              name: "macOS",
+              artifact: "gpt-tools-darwin-arm64.tar.gz",
+              executable_name: "gpt-tools.app",
+              os: macos-11,
+              build_tags: "production,desktop",
+              build_platform: "darwin/arm64",
+            }
 
     steps:
+      - name: Setup Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: ">=1.18.0"
 
-    - name: Setup Go 
-      uses: actions/setup-go@v3
-      with:
-        go-version: '>=1.17.0'
-    
-    - name: Setup NPM
-      uses: actions/setup-node@v3
-      with:
-        node-version: 16.14.x
+      - name: Setup NPM
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16.14.x
 
-    - name: Setup Webkit (Linux)
-      run: sudo apt update && sudo apt install -y libgtk-3-dev libwebkit2gtk-4.0-dev
-      if: ${{ matrix.config.name == 'Ubuntu' }}
+      - name: Setup Webkit (Linux)
+        run: sudo apt update && sudo apt install -y libgtk-3-dev libwebkit2gtk-4.0-dev
+        if: ${{ matrix.config.name == 'Ubuntu' }}
 
-    - name: Setup jq (macOS)
-      uses: dcarbone/install-jq-action@v1.0.1
-      if: ${{ matrix.config.name == 'macOS' }}
+      - name: Setup jq (macOS)
+        uses: dcarbone/install-jq-action@v1.0.1
+        if: ${{ matrix.config.name == 'macOS' }}
 
-    - name: Setup Restic
-      uses: AnimMouse/setup-restic@v1
+      - name: Setup Restic
+        uses: AnimMouse/setup-restic@v1
 
-    - name: Setup Wails
-      run: go install github.com/wailsapp/wails/v2/cmd/wails@v2.3.1
+      - name: Setup Wails
+        run: go install github.com/wailsapp/wails/v2/cmd/wails@v2.5.0
 
-    - name: Checkout
-      uses: actions/checkout@v3
-    
-    - name: Test
-      run: go test ./backend/...
+      - name: Checkout
+        uses: actions/checkout@v3
 
-    - name: Build
-      run: wails build -tags ${{ matrix.config.build_tags }} -platform ${{ matrix.config.build_platform }}
+      - name: Build
+        run: wails build -tags ${{ matrix.config.build_tags }} -platform ${{ matrix.config.build_platform }}
 
-    - name: Code Sign (Windows)
-      if: ${{ matrix.config.name == 'Windows' }}
-      uses: lando/code-sign-action@v2
-      with:
-        file: build/bin/${{ matrix.config.executable_name }}
-        certificate-data: ${{ secrets.WINDOWS_CODE_CERT_DATA }}
-        certificate-password: ${{ secrets.WINDOWS_CODE_CERT_PASS }}
+      - name: Archive
+        uses: thedoctor0/zip-release@main
+        with:
+          type: tar
+          directory: build
+          path: bin
+          filename: ${{ matrix.config.artifact }}
 
-    - name: Code Sign (macOS)
-      if: ${{ matrix.config.name == 'macOS' }}
-      env: 
-        MACOS_CODE_CERT_DATA: ${{ secrets.MACOS_CODE_CERT_DATA }}
-        MACOS_CODE_CERT_PASS: ${{ secrets.MACOS_CODE_CERT_PASS }}
-        MACOS_CODE_CERT_TEAM_ID: ${{ secrets.MACOS_CODE_CERT_TEAM_ID }}
-        MACOS_EXECUTABLE_PATH: ./build/bin/${{ matrix.config.executable_name }}
-      run: |
-        echo $MACOS_CODE_CERT_DATA | base64 --decode > certificate.p12
-        security create-keychain -p $MACOS_CODE_CERT_PASS build.keychain
-        security default-keychain -s build.keychain
-        security unlock-keychain -p $MACOS_CODE_CERT_PASS build.keychain
-        security import certificate.p12 -k build.keychain -P $MACOS_CODE_CERT_PASS -T /usr/bin/codesign
-        security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k $MACOS_CODE_CERT_PASS build.keychain
-        /usr/bin/codesign --force -s $MACOS_CODE_CERT_TEAM_ID --deep --options=runtime "$MACOS_EXECUTABLE_PATH"
-
-    - name: Notarize (macOS)
-      if: ${{ matrix.config.name == 'macOS' }}
-      uses: devbotsxyz/xcode-notarize@v1
-      with:
-        appstore-connect-username: ${{ secrets.MACOS_NOTARY_USER }}
-        appstore-connect-password: ${{ secrets.MACOS_NOTARY_PASS }}
-        primary-bundle-id: com.wails.restic-browser
-        product-path: ./build/bin/${{ matrix.config.executable_name }}
-        verbose: false
-    
-    - name: Archive
-      uses: thedoctor0/zip-release@main
-      with:
-        type: tar
-        directory: build
-        path: bin
-        filename: ${{ matrix.config.artifact }}
-
-    - name: Upload
-      uses: actions/upload-artifact@v3
-      with:
-        path: build/${{ matrix.config.artifact }}
-        name: ${{ matrix.config.artifact }}
+      - name: Upload
+        uses: actions/upload-artifact@v3
+        with:
+          path: build/${{ matrix.config.artifact }}
+          name: ${{ matrix.config.artifact }}
