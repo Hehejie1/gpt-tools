@@ -6,6 +6,7 @@ import { uniqueId } from "lodash-es";
 import { useMessageStore } from "@/store/useMessage";
 import { Send } from "@wails/go/gpt/ChatGPT";
 import { useConfigStore } from "@/store/useConfig";
+import { RoleType } from "@/constant";
 
 export type InputFooterProps = {};
 
@@ -48,7 +49,7 @@ export const InputFooter: React.FC<InputFooterProps> = () => {
     updateMessage({
       id: uniqueId("message"),
       left: false,
-      user_key: "user",
+      user_key: RoleType.User,
       user_name: "用户",
       user_avatar: "https://xsgames.co/randomusers/avatar.php?g=pixel&key=2",
       content: text,
@@ -73,7 +74,7 @@ export const InputFooter: React.FC<InputFooterProps> = () => {
           id: res.id,
           left: true,
           usage: res.usage,
-          user_key: "system",
+          user_key: RoleType.Assistant,
           user_name: "chatgpt",
           user_avatar:
             "https://xsgames.co/randomusers/avatar.php?g=pixel&key=1",
