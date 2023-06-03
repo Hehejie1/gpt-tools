@@ -68,6 +68,9 @@ func (this *ChatGptTool) ChatGPTModel(message []openai.ChatCompletionMessage, mo
 }
 
 type ContentType struct {
+	// system: 系统预置的信息，用户不可见
+	// user: 用户发送信息
+	// assistant: chatgpt回复信息
 	Role    string `json:"role"`
 	Content string `json:"content"`
 }

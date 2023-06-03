@@ -3,6 +3,7 @@ export const models = [
   { label: "gpt-4-32k", value: "GPT432K" },
   { label: "gpt-4-0314", value: "GPT40314" },
   { label: "gpt-4", value: "GPT4" },
+  { label: "gpt-4-mobile", value: "GPT4-mobile" },
   { label: "gpt-3.5-turbo-0301", value: "GPT3Dot5Turbo0301" },
   { label: "gpt-3.5-turbo", value: "GPT3Dot5Turbo" },
   { label: "text-davinci-003", value: "GPT3TextDavinci003" },
@@ -18,3 +19,12 @@ export const models = [
   { label: "ada", value: "GPT3Ada" },
   { label: "babbage", value: "GPT3Babbage" },
 ].map((item) => ({ label: item.value, value: item.label }));
+
+export enum RoleType {
+  /** 系统预置的信息，用户不可见 */
+  System = 'system',
+  /** 用户发送信息 */
+  User = 'user',
+  /** chatgpt回复信息 */
+  Assistant = 'assistant'
+}
